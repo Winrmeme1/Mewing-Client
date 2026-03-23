@@ -1,32 +1,32 @@
 {
 	"schemaVersion": 1,
-	"id": "aoba",
+	"id": "mewing",
 	"version": "1.4.5",
-	"name": "Aoba Client",
+	"name": "Mewing Client",
 	"description": "A Minecraft Fabric 1.21.11 utility mod.",
 	"authors": [
 		"Cocolots",
 		"cvs0"
 	],
 	"contact": {
-		"homepage": "https://aobaclient.com",
-		"sources": "https://github.com/coltonk9043/Aoba-Client",
-		"issues": "https://github.com/coltonk9043/Aoba-Client/issues",
+		"homepage": "https://mewingclient.com",
+		"sources": "https://github.com/coltonk9043/Mewing-Client",
+		"issues": "https://github.com/coltonk9043/Mewing-Client/issues",
 		"discord": "https://discord.gg/jEu6WfnyR6"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/aoba/icon.png",
+	"icon": "assets/mewing/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"main": [
-			"net.aoba.Aoba"
+			"net.mewing.Mewing"
 		]
 	},
 	"mixins": [
-		"aoba.mixins.json",
-		"aoba-sodium.mixins.json"
+		"mewing.mixins.json",
+		"mewing-sodium.mixins.json"
 	],
-	"accessWidener" : "aoba.accesswidener",
+	"accessWidener" : "mewing.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.18.4",
 		"minecraft": "~1.21.11",

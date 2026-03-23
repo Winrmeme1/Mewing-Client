@@ -1,0 +1,48 @@
+/*
+ * Mewing Hacked Client
+ * Copyright (C) 2019-2024 coltonk9043
+ *
+ * Licensed under the GNU General Public License, Version 3 or later.
+ * See <http://www.gnu.org/licenses/>.
+ */
+
+package net.mewing.event.events;
+
+import java.util.ArrayList;
+
+import net.mewing.event.listeners.AbstractListener;
+import net.mewing.event.listeners.Render2DListener;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphics;
+
+public class Render2DEvent extends AbstractEvent {
+	private final GuiGraphics matrices;
+	private final DeltaTracker renderTickCounter;
+
+	public GuiGraphics getDrawContext() {
+		return matrices;
+	}
+
+	public DeltaTracker getRenderTickCounter() {
+		return renderTickCounter;
+	}
+
+	public Render2DEvent(GuiGraphics context, DeltaTracker renderTickCounter) {
+		matrices = context;
+		this.renderTickCounter = renderTickCounter;
+	}
+
+	@Override
+	public void Fire(ArrayList<? extends AbstractListener> listeners) {
+		for (AbstractListener listener : listeners) {
+			Render2DListener renderListener = (Render2DListener) listener;
+			renderListener.onRender(this);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Class<Render2DListener> GetListenerClassType() {
+		return Render2DListener.class;
+	}
+}

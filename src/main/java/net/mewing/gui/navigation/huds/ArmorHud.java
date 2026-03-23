@@ -1,0 +1,65 @@
+/*
+ * Mewing Hacked Client
+ * Copyright (C) 2019-2024 coltonk9043
+ *
+ * Licensed under the GNU General Public License, Version 3 or later.
+ * See <http://www.gnu.org/licenses/>.
+ */
+
+package net.mewing.gui.navigation.huds;
+
+import java.util.ArrayList;
+
+import com.google.common.collect.Lists;
+import org.joml.Matrix3x2fStack;
+import net.mewing.gui.Rectangle;
+import net.mewing.gui.navigation.HudWindow;
+import net.mewing.utils.render.Render2D;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+
+public class ArmorHud extends HudWindow {
+
+	public ArmorHud(int x, int y) {
+		super("ArmorHud", x, y);
+		minHeight = 256f;
+		maxHeight = 256f;
+		minWidth = 16f;
+		maxWidth = 16f;
+	}
+
+	@Override
+	public void draw(GuiGraphics drawContext, float partialTicks) {
+		if (isVisible()) {
+			Rectangle pos = position.getValue();
+
+			if (pos.isDrawable()) {
+
+				// TODO: Don't like this but they removed the armor slot func.
+				ArrayList<ItemStack> armors = Lists.newArrayList(MC.player.getInventory().getItem(103),
+						MC.player.getInventory().getItem(102), MC.player.getInventory().getItem(101),
+						MC.player.getInventory().getItem(100));
+				;
+
+				float scale = getActualSize().getHeight() / 64.0f;
+
+				float x1 = pos.getX() / scale;
+				float y2 = (pos.getY() + pos.getHeight()) / scale;
+				float yOff = 0;
+				Matrix3x2fStack matrixStack = drawContext.pose();
+				matrixStack.pushMatrix();
+				matrixStack.scale(scale, scale);
+
+				for (ItemStack armor : armors) {
+					if (armor.getItem() != Items.AIR) {
+						Render2D.drawItem(drawContext, armor, x1, y2 - yOff - 16);
+					}
+					yOff += (16.0f);
+				}
+				matrixStack.popMatrix();
+			}
+		}
+		super.draw(drawContext, partialTicks);
+	}
+}

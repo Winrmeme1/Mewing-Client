@@ -1,0 +1,47 @@
+/*
+ * Mewing Hacked Client
+ * Copyright (C) 2019-2024 coltonk9043
+ *
+ * Licensed under the GNU General Public License, Version 3 or later.
+ * See <http://www.gnu.org/licenses/>.
+ */
+
+package net.mewing.gui.navigation.huds;
+
+import net.mewing.gui.GuiManager;
+import net.mewing.gui.Rectangle;
+import net.mewing.gui.ResizeMode;
+import net.mewing.gui.navigation.HudWindow;
+import net.mewing.utils.render.Render2D;
+import net.minecraft.client.gui.GuiGraphics;
+
+public class DayHud extends HudWindow {
+	private String timeText = null;
+
+	public DayHud(int x, int y) {
+		super("DayHud", x, y, 50, 24);
+		minWidth = 50f;
+		minHeight = 24f;
+		maxHeight = 24f;
+		resizeMode = ResizeMode.None;
+	}
+
+	@Override
+	public void update() {
+		super.update();
+		timeText = "Day: " + (int) (MC.level.getGameTime() / 24000);
+	}
+
+	@Override
+	public void draw(GuiGraphics drawContext, float partialTicks) {
+		if (timeText != null && isVisible()) {
+			Rectangle pos = position.getValue();
+			if (pos.isDrawable()) {
+				Render2D.drawString(drawContext, timeText, pos.getX(), pos.getY(),
+						GuiManager.foregroundColor.getValue().getColorAsInt());
+			}
+		}
+
+		super.draw(drawContext, partialTicks);
+	}
+}
