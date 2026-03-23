@@ -182,19 +182,19 @@ public class MainMenuScreen extends Screen {
 		int startX = (width - BUTTON_WIDTH) / 2;
 		int startY = (int) ((height - widgetHeight) / 2 + smallScreenHeightOffset);
 
-		int logoWidth = (int) (LOGO_HEIGHT * (719.0 / 270.0));
+		int logoWidth = (int) (LOGO_HEIGHT * (1664.0 / 624.0));
 		int logoX = (width - logoWidth) / 2;
 		int logoY = startY - LOGO_HEIGHT - 10;
 		drawContext.blit(RenderPipelines.GUI_TEXTURED, TextureBank.mainmenu_logo, logoX, logoY, 0, 0, logoWidth,
-				LOGO_HEIGHT, 719, 270, 719, 270);
+				LOGO_HEIGHT, 1664, 624, 1664, 624);
 
-		drawContext.drawString(font, "Mewing " + MewingClient.MEWING_VERSION, 2, height - 10, 0xFFFF00FF);
+		drawContext.drawString(font, "Mewing " + MewingClient.MEWING_VERSION, 2, height - 10, 0xFF00BFFF);
 
 		// Draw out of date if out of date.
 		// TODO: Add option to hide if on previous versions.
 		if (fetchedVersion != null && !fetchedVersion.equals(MewingClient.MEWING_VERSION)) {
 			drawContext.drawString(font, "New version available: " + fetchedVersion, 2, height - 20,
-					0xFFFF00FF);
+					0xFF00BFFF);
 		}
 
 		if (MewingClient.addons.isEmpty()) {

@@ -55,9 +55,9 @@ public class MewingButtonWidget extends AbstractButton {
 		hoverProgress = Math.min(hoverProgress, 1.0f);
 		hoverProgress = (float) Math.sin(hoverProgress * Math.PI / 2);
 
-		Color boxColor = Color.interpolate(GuiManager.backgroundColor.getValue(), Color.convertHextoRGB("FFC0C0C0"),
+		Color boxColor = Color.interpolate(GuiManager.backgroundColor.getValue(), Color.convertHextoRGB("FF0080FF"),
 				hoverProgress);
-		Color outlineColor = Color.interpolate(GuiManager.borderColor.getValue(), Color.convertHextoRGB("C0C0C0"),
+		Color outlineColor = Color.interpolate(GuiManager.borderColor.getValue(), Color.convertHextoRGB("0050A0"),
 				hoverProgress);
 
 		Render2D.setup();

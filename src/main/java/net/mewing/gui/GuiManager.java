@@ -101,15 +101,15 @@ public class GuiManager implements KeyDownListener, TickListener, Render2DListen
 
 	public static ColorSetting foregroundColor = ColorSetting.builder().id("hud_foreground_color")
 			.displayName("GUI Foreground Color").description("Color of the foreground.")
-			.defaultValue(new Color(238, 21, 247)).build();
+			.defaultValue(new Color(0, 191, 255)).build();
 
 	public static ColorSetting borderColor = ColorSetting.builder().id("hud_border_color")
-			.displayName("GUI Border Color").description("Color of the borders.").defaultValue(new Color(0, 0, 0))
+			.displayName("GUI Border Color").description("Color of the borders.").defaultValue(new Color(0, 80, 160))
 			.build();
 
 	public static ColorSetting backgroundColor = ColorSetting.builder().id("hud_background_color")
 			.displayName("GUI Background Color").description("Color of the background.")
-			.defaultValue(new Color(0, 0, 0, 50)).build();
+			.defaultValue(new Color(0, 30, 80, 50)).build();
 
 	public static FloatSetting roundingRadius = FloatSetting.builder().id("hud_rounding_radius")
 			.displayName("Corner Rounding").description("The radius of the rounding on hud.").defaultValue(6f)
