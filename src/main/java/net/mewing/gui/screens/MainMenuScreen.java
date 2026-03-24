@@ -47,10 +47,6 @@ public class MainMenuScreen extends Screen {
 			MEWING_PANORAMA_RENDERER);
 	private static boolean panoramaRegistered = false;
 
-	// Logo texture native size
-	private static final int LOGO_TEX_W = 1568;
-	private static final int LOGO_TEX_H = 588;
-
 	public static void registerPanoramaTextures(net.minecraft.client.renderer.texture.TextureManager textureManager) {
 		if (!panoramaRegistered) {
 			MEWING_PANORAMA_RENDERER.registerTextures(textureManager);
@@ -58,10 +54,10 @@ public class MainMenuScreen extends Screen {
 		}
 	}
 
-	// Button layout constants — computed in init() where width/height are valid
-	private int BUTTON_WIDTH;
-	private int BUTTON_HEIGHT;
-	private int SPACING;
+	final int LOGO_HEIGHT = Math.max(58, height / 12);
+	final int BUTTON_WIDTH = Math.max(150, width / 6);
+	final int BUTTON_HEIGHT = Math.max(25, height / 20);
+	final int SPACING = Math.max(5, height / 100);
 
 	int smallScreenHeightOffset = 0;
 
@@ -81,7 +77,8 @@ public class MainMenuScreen extends Screen {
 
 	private static URI createURI(String url) {
 		try {
-			return new URI(url);
+			URI uri = new URI(url);
+			return uri;
 		} catch (URISyntaxException e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -89,40 +86,49 @@ public class MainMenuScreen extends Screen {
 
 	private void fetchLatestVersion() {
 		try {
-			HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).followRedirects(Redirect.NORMAL).build();
+			HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).followRedirects(Redirect.NORMAL)
+					.build();
+
 			HttpRequest request = HttpRequest
-					.newBuilder(createURI("https://api.github.com/repos/coltonk9043/Mewing-MC-Hacked-Client/releases/latest"))
-					.header("User-Agent", "Mozilla/5.0")
-					.header("Accept", "application/json")
+					.newBuilder(
+							createURI("https://api.github.com/repos/coltonk9043/Mewing-MC-Hacked-Client/releases/latest"))
+					.header("User-Agent",
+							"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36")
+					.header("Accept", "application/json").header("Content-Type", "application/x-www-form-urlencoded")
 					.GET().build();
-			HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+
+			HttpResponse<String> response;
+			response = client.send(request, BodyHandlers.ofString());
+			String responseString = response.body();
+
 			int status = response.statusCode();
-			if (status != HttpURLConnection.HTTP_OK) return;
-			JsonObject json = new Gson().fromJson(response.body(), JsonObject.class);
+			if (status != HttpURLConnection.HTTP_OK) {
+				throw new IllegalArgumentException("Device token could not be fetched. Invalid status code " + status);
+			}
+
+			JsonObject json = new Gson().fromJson(responseString, JsonObject.class);
 			String tagName = json.get("tag_name").getAsString();
-			if (tagName != null) fetchedVersion = tagName;
+			if (tagName != null)
+				fetchedVersion = tagName;
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
-	@Override
 	public void init() {
 		super.init();
 
-		BUTTON_WIDTH  = Math.max(160, width / 5);
-		BUTTON_HEIGHT = Math.max(24, height / 22);
-		SPACING       = Math.max(6, height / 90);
+		if (height <= 650)
+			smallScreenHeightOffset = 40;
+		else
+			smallScreenHeightOffset = 0;
 
-		smallScreenHeightOffset = (height <= 650) ? 35 : 0;
+		int columns = 2;
+		int rows = 3;
+		float widgetHeight = ((BUTTON_HEIGHT + SPACING) * rows);
+		int startX = (int) ((width - (BUTTON_WIDTH * columns + SPACING * (columns - 1))) / 2.0f);
+		int startY = (int) ((height - widgetHeight) / 2) + smallScreenHeightOffset;
 
-		// --- 2-column, 3-row grid centred on screen ---
-		int totalW  = BUTTON_WIDTH * 2 + SPACING;
-		int totalH  = BUTTON_HEIGHT * 3 + SPACING * 2;
-		int startX  = (width  - totalW) / 2;
-		int startY  = (height - totalH) / 2 + smallScreenHeightOffset;
-
-		// Row 0
 		MewingButtonWidget singleplayerButton = new MewingButtonWidget(startX, startY, BUTTON_WIDTH, BUTTON_HEIGHT,
 				Component.nullToEmpty("Singleplayer"));
 		singleplayerButton.setPressAction(b -> minecraft.setScreen(new SelectWorldScreen(this)));
@@ -133,7 +139,6 @@ public class MainMenuScreen extends Screen {
 		multiplayerButton.setPressAction(b -> minecraft.setScreen(new JoinMultiplayerScreen(this)));
 		addRenderableWidget(multiplayerButton);
 
-		// Row 1
 		MewingButtonWidget realmsButton = new MewingButtonWidget(startX, startY + BUTTON_HEIGHT + SPACING, BUTTON_WIDTH,
 				BUTTON_HEIGHT, Component.nullToEmpty("Realms"));
 		realmsButton.setPressAction(b -> minecraft.setScreen(new RealmsMainScreen(this)));
@@ -144,61 +149,60 @@ public class MainMenuScreen extends Screen {
 		settingsButton.setPressAction(b -> minecraft.setScreen(new OptionsScreen(this, MC.options)));
 		addRenderableWidget(settingsButton);
 
-		// Row 2
-		MewingButtonWidget addonsButton = new MewingButtonWidget(startX, startY + (BUTTON_HEIGHT + SPACING) * 2,
+		MewingButtonWidget addonsButton = new MewingButtonWidget(startX, startY + ((BUTTON_HEIGHT + SPACING) * 2),
 				BUTTON_WIDTH, BUTTON_HEIGHT, Component.nullToEmpty("Addons"));
 		addonsButton.setPressAction(b -> minecraft.setScreen(new AddonScreen(this)));
 		addRenderableWidget(addonsButton);
 
 		MewingButtonWidget quitButton = new MewingButtonWidget(startX + BUTTON_WIDTH + SPACING,
-				startY + (BUTTON_HEIGHT + SPACING) * 2, BUTTON_WIDTH, BUTTON_HEIGHT, Component.nullToEmpty("Quit"));
+				startY + ((BUTTON_HEIGHT + SPACING) * 2), BUTTON_WIDTH, BUTTON_HEIGHT, Component.nullToEmpty("Quit"));
 		quitButton.setPressAction(b -> minecraft.destroy());
 		addRenderableWidget(quitButton);
 	}
 
 	@Override
-	public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta) {
-		super.render(ctx, mouseX, mouseY, delta);
+	public void render(GuiGraphics drawContext, int mouseX, int mouseY, float delta) {
+		super.render(drawContext, mouseX, mouseY, delta);
 
-		// --- Dark blue gradient overlay so buttons are readable over panorama ---
-		int overlayTop    = 0x88000A1A;  // dark navy, semi-transparent
-		int overlayBottom = 0xCC000510;  // slightly darker at bottom
-		ctx.fillGradient(0, 0, width, height, overlayTop, overlayBottom);
+		float widgetHeight = (BUTTON_HEIGHT + SPACING) * 5;
+		int startX = (width - BUTTON_WIDTH) / 2;
+		int startY = (int) ((height - widgetHeight) / 2 + smallScreenHeightOffset);
 
-		// --- Logo ---
-		int totalH  = BUTTON_HEIGHT * 3 + SPACING * 2;
-		int startY  = (height - totalH) / 2 + smallScreenHeightOffset;
+		int logoWidth = (int) (LOGO_HEIGHT * (1568.0 / 588.0));
+		int logoX = (width - logoWidth) / 2;
+		int logoY = startY - LOGO_HEIGHT - 10;
+		drawContext.blit(RenderPipelines.GUI_TEXTURED, TextureBank.mainmenu_logo, logoX, logoY, 0, 0, logoWidth,
+				LOGO_HEIGHT, 1568, 588, 1568, 588);
 
-		// Scale logo to fit nicely — max 55% of screen width, max 80px tall
-		int maxLogoW = (int) (width * 0.55f);
-		int maxLogoH = 80;
-		float ratio  = (float) LOGO_TEX_W / LOGO_TEX_H;
-		int logoH    = Math.min(maxLogoH, (int) (maxLogoW / ratio));
-		int logoW    = (int) (logoH * ratio);
-		int logoX    = (width - logoW) / 2;
-		int logoY    = startY - logoH - SPACING * 2;
-
-		ctx.blit(RenderPipelines.GUI_TEXTURED,
-				TextureBank.mainmenu_logo,
-				logoX, logoY, logoW, logoH,
-				0, 0, LOGO_TEX_W, LOGO_TEX_H,
-				LOGO_TEX_W, LOGO_TEX_H);
-
-		// --- Version label bottom-left ---
-		String versionText = "Mewing " + MewingClient.MEWING_VERSION;
-		ctx.drawString(font, versionText, 4, height - 10, 0xFF00BFFF, true);
+		drawContext.drawString(font, "Mewing " + MewingClient.MEWING_VERSION, 2, height - 10, 0xFF00BFFF);
 
 		if (fetchedVersion != null && !fetchedVersion.equals(MewingClient.MEWING_VERSION)) {
-			ctx.drawString(font, "Update available: " + fetchedVersion, 4, height - 20, 0xFF87CEFA, true);
+			drawContext.drawString(font, "New version available: " + fetchedVersion, 2, height - 20, 0xFF00BFFF);
 		}
 
-		// --- Addon list top-right ---
-		if (!MewingClient.addons.isEmpty()) {
+		if (MewingClient.addons.isEmpty()) {
+			String noAddonsText = "No addons loaded";
+			int textWidth = font.width(noAddonsText);
+			drawContext.drawString(font, noAddonsText, width - textWidth - 15, 10, 0xFFFFFFFF);
+		} else {
 			int yOffset = 10;
 			for (IAddon addon : MewingClient.addons) {
-				String line = addon.getName() + " by " + addon.getAuthor();
-				int tw = font.width(line);
-				ctx.drawString(font, line, width - tw - 10, yOffset, 0xFF00BFFF, true);
+				String addonName = addon.getName();
+				String byText = " by ";
+				String author = addon.getAuthor();
+
+				int addonNameWidth = font.width(addonName);
+				int byTextWidth = font.width(byText);
+				int authorWidth = font.width(author);
+
+				drawContext.drawString(font, addonName,
+						width - addonNameWidth - byTextWidth - authorWidth - 20, yOffset, 0xFF00BFFF);
+
+				drawContext.drawString(font, byText, width - byTextWidth - authorWidth - 15, yOffset,
+						0xFFFFFFFF);
+
+				drawContext.drawString(font, author, width - authorWidth - 10, yOffset, 0xFF87CEFA);
+
 				yOffset += 10;
 			}
 		}
@@ -211,11 +215,12 @@ public class MainMenuScreen extends Screen {
 
 	@Override
 	protected void renderPanorama(GuiGraphics context, float delta) {
-		if (!panoramaRegistered) return;
+		if (!panoramaRegistered)
+			return;
+
 		try {
 			MEWING_ROTATING_PANORAMA_RENDERER.render(context, width, height, true);
 		} catch (IllegalStateException e) {
-			// panorama not ready yet
 		}
 	}
 }
