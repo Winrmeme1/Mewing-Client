@@ -25,7 +25,6 @@ import java.util.concurrent.Executors;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.realmsclient.RealmsMainScreen;
 import net.mewing.MewingClient;
 import net.mewing.api.IAddon;
@@ -179,14 +178,11 @@ public class MainMenuScreen extends Screen {
 		int logoX    = (width - logoW) / 2;
 		int logoY    = startY - logoH - SPACING * 2;
 
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
 		ctx.blit(RenderPipelines.GUI_TEXTURED,
 				TextureBank.mainmenu_logo,
 				logoX, logoY, logoW, logoH,
 				0, 0, LOGO_TEX_W, LOGO_TEX_H,
 				LOGO_TEX_W, LOGO_TEX_H);
-		RenderSystem.disableBlend();
 
 		// --- Version label bottom-left ---
 		String versionText = "Mewing " + MewingClient.MEWING_VERSION;
